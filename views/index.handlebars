@@ -1,0 +1,11 @@
+<div class="container">
+{{#each articles}}
+<div class="title"><h2>{{this.title}}</h2>
+<hr>
+<p class="summary"> {{this.summary}} </p>
+<div class="links"><a href="https://www.gameinformer.com{{this.link}}" target="_blank">Article</a> || <a href="/article/comments/{{this._id}}">Comments</a></div>
+</div>
+{{/each}}
+</div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

@@ -1,0 +1,71 @@
+<div class="row center">
+    <div class="col s12">
+        <h4 class="title"> {{title}} </h4>
+        <h5 class="summary"> {{summary}}</h5>
+    </div>
+</div>
+<hr>
+<br><br>
+<div class="container">
+    <div class="row center">
+        <form class="col s12">
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="name" type="text" class="validate">
+                    <label class="active" for="name">Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <textarea id="comments" class="materialize-textarea"></textarea>
+                    <label for="comments">Comment</label>
+                </div>
+            </div>
+            <div id="data" data-id="{{id}}"></div>
+            <a class="waves-effect waves-light btn" id="submitComment" >Submit</a>
+        </form>
+    </div>
+</div>
+
+{{#if note}}
+{{#each note}}
+<div class="row center">
+    <div class="col s6">
+        <h6 class="author">{{title}}</h6>
+        <hr>
+        <p class="comment">{{body}}</p>
+    </div>
+</div>
+{{/each}}
+{{else}}
+<h3 class="center">Be the first to comment!</h3>
+{{/if}}
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+<script>
+    $(document).on("click", "#submitComment", () => {
+        event.preventDefault();
+        console.log("click");
+        var thisId = $("#data").attr("data-id");
+        console.log(thisId);
+        console.log($("#name").val(), $("#comments").val());
+
+        
+        
+    })
+</script>
+
+{{!-- $.ajax({
+            method: "POST",
+            url: "/api/articles/" + thisId,
+            data: {
+                title: $("#name").val(),
+                body: $("#comments").val()
+            }
+        }).then(data => {
+            console.log(data);
+            $("#name").val("");
+            $("#comments").val("");
+        }) --}}
