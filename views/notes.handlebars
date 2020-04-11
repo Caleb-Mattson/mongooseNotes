@@ -22,39 +22,82 @@
                 </div>
             </div>
             <div id="data" data-id="{{id}}"></div>
-            <a class="waves-effect waves-light btn" id="submitComment" >Submit</a>
+            <a class="waves-effect waves-light btn" id="submitComment">Submit</a>
         </form>
     </div>
 </div>
+<br><br>
 
-{{#if note}}
-{{#each note}}
-<div class="row center">
-    <div class="col s6">
-        <h6 class="author">{{title}}</h6>
-        <hr>
-        <p class="comment">{{body}}</p>
-    </div>
-</div>
-{{/each}}
-{{else}}
-<h3 class="center">Be the first to comment!</h3>
-{{/if}}
+<div id="notes" class="container center"></div>
+
+
+<style>
+    .authorComment {
+        padding-left: 10px;
+        padding-right: 10px;
+        border: 1px solid black;
+    }
+</style>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 
 <script>
-    $(document).on("click", "#submitComment", () => {
-        event.preventDefault();
-        console.log("click");
+    $(document).ready(function () {
+        console.log("ready!");
         var thisId = $("#data").attr("data-id");
-        console.log(thisId);
-        console.log($("#name").val(), $("#comments").val());
 
-        
-        
-    })
+        const commentGet = () => {
+            $("#notes").empty();
+            $.ajax({
+                method: "GET",
+                url: "/api/articles/" + thisId
+            })
+                .then(function (data) {
+                    console.log(data);
+
+                    if (data.note) {
+                        var div = $("<div>");
+                        div.addClass("comment col s6");
+                        var div2 = $("<div>");
+                        div2.addClass("authorComment");
+                        div2.html("<h4><strong>" + data.note.title + "</strong></h4><hr><p>'" + data.note.body + "'</p>");
+                        div.append(div2);
+                        $("#notes").append(div);
+                    } else {
+                        var div = $("<div>");
+                        div.addClass("comment");
+                        var h2 = $("<h2>");
+                        h2.text("Be the first to comment.");
+                        div.append(h2);
+                        $("#notes").append(div);
+                    }
+                });
+        }
+
+        commentGet();
+
+        $(document).on("click", "#submitComment", () => {
+            event.preventDefault();
+            console.log("click");
+            console.log($("#name").val(), $("#comments").val());
+
+            $.ajax({
+                method: "POST",
+                url: "/api/articles/" + thisId,
+                data: {
+                    title: $("#name").val(),
+                    body: $("#comments").val()
+                }
+            }).then(data => {
+                console.log(data);
+                $("#name").val("");
+                $("#comments").val("");
+                commentGet();
+            });
+        });
+    });
+
 </script>
 
 {{!-- $.ajax({

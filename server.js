@@ -21,14 +21,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost/mongoArticles", { useNewUrlParser: true });
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+mongoose.connect(MONGODB_URI);
 
 app.get("/", (req, res) => {
     db.Article.find({})
         .then(dbArticle => {
             console.log(dbArticle)
             var articlesArr = [];
-            for (var i = 0; i < 10; i++){
+            for (var i = 0; i < dbArticle.length; i++) {
                 articlesArr.push({
                     _id: dbArticle[i]._id,
                     title: dbArticle[i].title,
@@ -37,7 +39,7 @@ app.get("/", (req, res) => {
                 })
             }
             // var articles = res.json(dbArticle);
-            res.render("index", {articles : articlesArr});
+            res.render("index", { articles: articlesArr });
         })
         .catch(function (err) {
             res.json(err);
@@ -47,24 +49,17 @@ app.get("/", (req, res) => {
 app.get("/article/comments/:id", (req, res) => {
     var id = req.params.id;
 
-    db.Article.findOne({_id: id}).populate("note").then( result => {
-        var noteArr = [];
-        if(result.note){
-            for (var i = 0; i < result.note.length; i++){
-                noteArr.push({
-                    title: result.note[i].title,
-                    body: result.note[i].body
-                });
-            };
-        }
-        
-        res.render("notes", {
-            title: result.title,
-            summary: result.summary,
-            id: result._id,
-            note: noteArr
+    db.Article.findOne({ _id: id })
+        .populate("note")
+        .then(result => {
+            console.log(result);
+
+            res.render("notes", {
+                title: result.title,
+                summary: result.summary,
+                id: result._id
+            });
         });
-    });
 });
 
 app.get("/scrape", function (req, res) {
@@ -89,12 +84,12 @@ app.get("/scrape", function (req, res) {
             console.log(result);
 
             db.Article.create(result)
-              .then(function (dbArticle) {
-                console.log(dbArticle);
-              })
-              .catch(function (err) {
-                console.log(err);
-              });
+                .then(function (dbArticle) {
+                    console.log(dbArticle);
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
         });
 
         res.send("Scrape Complete");
